@@ -2,6 +2,10 @@ import os
 import time
 import re
 from slackclient import SlackClient
+import weather as weather
+
+
+degree_sign= u'\N{DEGREE SIGN}'
 
 # init Slack Client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -48,6 +52,9 @@ def handle_command(command, channel):
   # This is where you start to implement more commands!
   if command.startswith(EXAMPLE_COMMAND):
     response = "Sure...write some more code then I can do that!"
+  elif "today" and "weather" in command.lower():
+    weatherConditions = weather.get_weather()
+    response = "Today's Weather:" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
 
   # Sends the response back to the channel
   slack_client.api_call(
