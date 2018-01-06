@@ -8,7 +8,11 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
+import time
 import datetime
+from datetime import timezone
+from dateutil import tz
+from dateutil import parser
 
 try:
     import argparse
@@ -51,6 +55,8 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
 def main():
     """Shows basic usage of the Google Calendar API.
 
@@ -61,10 +67,10 @@ def main():
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
-    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    now = (datetime.datetime.utcnow().isoformat() + 'Z')  # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+        calendarId='primary', timeMin=now, maxResults=5, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
@@ -72,7 +78,8 @@ def main():
         print('No upcoming events found.')
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        dt = parser.parse(start)
+        print(dt.strftime("%B %d, %Y %H:%M:%S"), event['summary'])
 
 
 if __name__ == '__main__':
