@@ -3,9 +3,11 @@ import time
 import re
 from slackclient import SlackClient
 import weather as weather
+import parseCSV as parseCSV
 
 
-degree_sign= u'\N{DEGREE SIGN}'
+degree_sign = u'\N{DEGREE SIGN}'
+locations = parseCSV.readCSV("uscitiesv1.3.csv")
 
 # init Slack Client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
@@ -40,6 +42,14 @@ def parse_direct_mention(message_text):
   # the first group contains the username, the second group contains the remaining message
   return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
 
+def get_location(command):
+  '''
+    Gets the location of the command if there is one 
+  '''
+  commandWords = command.split(" ")
+  # last index is the location
+  return commandWords[-1]  
+
 def handle_command(command, channel):
   '''
     Executes bot command if the command is known
@@ -47,22 +57,26 @@ def handle_command(command, channel):
   # Default response is help text for the user
   default_response = "Not sure what you mean. Try *{}*.".format(EXAMPLE_COMMAND)
 
+  # Location
+  location = get_location(command)
   # Finds and executs the command, filling in response
   response = None
   # This is where you start to implement more commands!
-  if command.startswith(EXAMPLE_COMMAND):
-    response = "Sure...write some more code then I can do that!"
+  if "help" in command.lower():
+    response = "List of known commands:" + '\n' + "Get today's weather - Type a command that contains the words 'today's weather'" + "\n" + "Today's weather in specific location - Type in a command with the words 'today's weather' and a location (City, State)"
+  
+  elif "weather" and location in locations:
+    weatherConditions = weather.get_weather(location)
+    response = "Weather in" + location + ":" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
   elif "today" and "weather" in command.lower():
-    weatherConditions = weather.get_weather()
+    weatherConditions = weather.get_weather_no_location()
     response = "Today's Weather:" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
-
   # Sends the response back to the channel
   slack_client.api_call(
     "chat.postMessage",
     channel = channel,
     text=response or default_response
   )  
-
 if __name__ == "__main__":
   if slack_client.rtm_connect(with_team_state=False):
     print("Emily connected and running!")

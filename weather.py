@@ -16,37 +16,39 @@ api = Api(api_key)
 
 
 # url
-base_url = "https://api.weatherbit.io/v2.0/current?ip=auto&units=I&key=" + api_key
-r = requests.get(base_url)
-temp = ''
-weather = ''
-app_temp = ''
-humidity = ''
-weatherConditions = []
 
 
-
-
-
-def get_weather():
+def get_weather_no_location():
+  base_url = "https://api.weatherbit.io/v2.0/current?ip=auto&units=I&key=" + api_key
+  r = requests.get(base_url)
+  weatherConditions = []
   try:
     j = json.loads(r.text)
     for x in j['data']:
-      temp = x['temp']
-      app_temp = x['app_temp']
       weather_data = x['weather']
-      humidity = x['rh']
-      weather = weather_data['description']
-      weatherConditions.append(temp)
-      weatherConditions.append(app_temp)
-      weatherConditions.append(humidity)
-      weatherConditions.append(weather)
-    
+      weatherConditions.append(x['temp'])
+      weatherConditions.append(x['app_temp'])
+      weatherConditions.append(x['rh'])
+      weatherConditions.append(weather_data['description'])
   except (ValueError, KeyError, TypeError):
     print("JSON format error")
+
   return weatherConditions
 
+def get_weather(location):
+  new_url = "https://api.weatherbit.io/v2.0/current?city=" + str(location) + "&units=I&key=" + api_key
+  r = requests.get(new_url)
+  weatherConditions = []
+  try:
+    j = json.loads(r.text)
+    for x in j['data']:
+      weather_data = x['weather']
+      weatherConditions.append(x['temp'])
+      weatherConditions.append(x['app_temp'])
+      weatherConditions.append(x['rh'])
+      weatherConditions.append(weather_data['description'])
+  except  (ValueError, KeyError, TypeError):
+    print("JSON format error")
 
-  
+  return weatherConditions
 
-print(get_weather())
