@@ -4,6 +4,7 @@ import re
 from slackclient import SlackClient
 import weather as weather
 import parseCSV as parseCSV
+import googCalendar as googCalendar
 
 
 degree_sign = u'\N{DEGREE SIGN}'
@@ -62,6 +63,8 @@ def handle_command(command, channel):
   # This is where you start to implement more commands!
   if "help" in command.lower():
     response = "List of known commands:" + '\n' + "Get today's weather - Type a command that contains the words 'today's weather'" + "\n" + "Today's weather in specific location - Type in a command with the words 'today's weather' and a location (City, State)" 
+  elif "agenda" in command.lower():
+    response = googCalendar.get_todays_agenda()
   elif "weather" and location != "No locations found.":
     weatherConditions = weather.get_weather(location)
     response = "Weather in " + location + ":" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
@@ -70,6 +73,7 @@ def handle_command(command, channel):
     response = "Today's Weather:" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
   elif not todaysWeatherKeyword and location == "No locations found.":
     response = "Sorry, can't find the weather for that place."
+  
   # Sends the response back to the channel
   slack_client.api_call(
     "chat.postMessage",

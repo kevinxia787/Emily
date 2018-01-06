@@ -1,3 +1,8 @@
-stringA = "what is the weather in New York, NY"
-print(stringA.split(" "))
-print(stringA.split(" ")[-2] + stringA.split(" ")[-1])
+import datetime
+
+now = datetime.datetime.utcnow()
+print(type(now))
+maxN = now.replace(hour=0, minute=0, second=0)
+maxN = now.replace(day=now.day+1)
+print(now)
+

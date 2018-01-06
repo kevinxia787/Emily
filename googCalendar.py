@@ -54,33 +54,43 @@ def get_credentials():
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
-
-def utc_to_local(utc_dt):
-    return utc_dt.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
-def main():
-    """Shows basic usage of the Google Calendar API.
-
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
-    """
+    
+def get_todays_agenda():
+    ''' 
+        Get today's agenda
+    '''
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
-    now = (datetime.datetime.utcnow().isoformat() + 'Z')  # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
+    # now = (datetime.datetime.utcnow().isoformat() + 'Z')  # 'Z' indicates UTC time
+    now = datetime.datetime.utcnow()
+    now = now.replace(hour=0, minute=0, second=0).isoformat() + 'Z'
+    # maxTime = (datetime.datetime.utcnow().isoformat() + 'Z')
+    utcNow = datetime.datetime.utcnow()
+    timeMax = utcNow.replace(day=utcNow.day+1).isoformat() + 'Z'
+    print("Getting today's agenda")
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=5, singleEvents=True,
+        calendarId='primary', timeMin=now, timeMax=timeMax, maxResults=7, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
+
+    responseString = "Today's Agenda: \n"
 
     if not events:
         print('No upcoming events found.')
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
         dt = parser.parse(start)
-        print(dt.strftime("%B %d, %Y %H:%M:%S"), event['summary'])
+        from_zone = tz.tzutc()
+        to_zone = tz.tzlocal()
+        dt = dt.astimezone(to_zone)
+        start = dt.strftime("%B %d, %Y %I:%M:%S %p")
+        responseString = responseString + start + " " + event['summary'] + "\n"
+        # print(start, event['summary'])
+    
+    return responseString
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
