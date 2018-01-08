@@ -6,7 +6,7 @@ def get_all_weather_conditions():
   response = requests.get(url)
   html = response.content
 
-  soup = BeautifulSoup(html)
+  soup = BeautifulSoup(html, 'lxml')
   table = soup.find('tbody')
   list_of_rows = []
   for row in table.findAll('tr'):
