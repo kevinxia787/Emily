@@ -23,6 +23,11 @@ MENTION_REGEX = "^<@(|[WU].+)>(.*)"
 # keywords
 todaysWeather = ['today', 'now']
 
+# list of commands
+listCommand = ["Today's weather ", "Weather in [City, State] ", "Today's Agenda "]
+commandDescr = ["- Get today's weather", "- Get weather in [City, State]", "- Get today's agenda"]
+
+
 def parse_bot_commands(slack_events):
   '''
     Parses a list of events coming from the Slack RTM API to find bot Commands.
@@ -62,15 +67,25 @@ def handle_command(command, channel):
   response = None
   # This is where you start to implement more commands!
   if "help" in command.lower():
-    response = "List of known commands:" + '\n' + "Get today's weather - Type a command that contains the words 'today's weather'" + "\n" + "Today's weather in specific location - Type in a command with the words 'today's weather' and a location (City, State)" 
+    response = "List of known commands:" + "\n"
+    for i in range(0, 3):
+      response = response + listCommand[i] + commandDescr[i] + "\n" 
+  # Get's list of events of today
   elif "agenda" in command.lower():
     response = googCalendar.get_todays_agenda()
+  # Get weather of a specific location
   elif "weather" and location != "No locations found.":
     weatherConditions = weather.get_weather(location)
     response = "Weather in " + location + ":" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
+    response += "\n" + "Looks like " +  weatherConditions[3].lower() + " today. " + weather.advice_response(weatherConditions[3])
+   
+  # Get weather today
   elif todaysWeatherKeyword and command.find("weather") != 1:
     weatherConditions = weather.get_weather_no_location()
+    print(weatherConditions)
     response = "Today's Weather:" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
+    response += "\n" + "It's " + str(weatherConditions[0]) + " " + degree_sign + "F. " + weather.check_severity(weatherConditions[0])
+  # LocationError handling
   elif not todaysWeatherKeyword and location == "No locations found.":
     response = "Sorry, can't find the weather for that place."
   
