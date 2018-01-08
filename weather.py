@@ -78,7 +78,7 @@ def check_severity(temp):
     return "It's pretty cold out there, bring a coat."
   elif (temp < 35):
     return "Brrr!! Layer up, it's freezing out there!"
-  elif(temp > 65 and temp < 80:
+  elif(temp > 65 and temp < 80):
     return "It's pretty warm out there. Enjoy!"
   else:
     return "Wow it's burning hot! Get some air conditioning fast!"
