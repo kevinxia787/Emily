@@ -93,6 +93,8 @@ def advice_response(weather):
       return "Enjoy the weather!"
     elif weather.find("cloud") != -1:
       return "Hopefully it clears up!"
+    else:
+      return "Enjoy the weather!"
   
 
 

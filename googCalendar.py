@@ -64,11 +64,10 @@ def get_todays_agenda():
     service = discovery.build('calendar', 'v3', http=http)
 
     # now = (datetime.datetime.utcnow().isoformat() + 'Z')  # 'Z' indicates UTC time
-    now = datetime.datetime.utcnow()
-    now = now.replace(hour=0, minute=0, second=0).isoformat() + 'Z'
+    now = datetime.datetime.utcnow().isoformat() + 'Z'
     # maxTime = (datetime.datetime.utcnow().isoformat() + 'Z')
     utcNow = datetime.datetime.utcnow()
-    timeMax = utcNow.replace(day=utcNow.day+1).isoformat() + 'Z'
+    timeMax = utcNow.replace(hour=utcNow.hour+6).isoformat() + 'Z'
     print("Getting today's agenda")
     eventsResult = service.events().list(
         calendarId='primary', timeMin=now, timeMax=timeMax, maxResults=7, singleEvents=True,
@@ -78,7 +77,7 @@ def get_todays_agenda():
     responseString = "Today's Agenda: \n"
 
     if not events:
-        print('No upcoming events found.')
+        responseString = 'No upcoming events found.'
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
         dt = parser.parse(start)
@@ -86,7 +85,7 @@ def get_todays_agenda():
         to_zone = tz.tzlocal()
         dt = dt.astimezone(to_zone)
         start = dt.strftime("%B %d, %Y %I:%M:%S %p")
-        responseString = responseString + start + " " + event['summary'] + "\n"
+        responseString = responseString + start + " " + event['summary'] +  " @ " + event['location'] + "\n"
         # print(start, event['summary'])
     
     return responseString

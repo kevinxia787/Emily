@@ -66,7 +66,11 @@ def handle_command(command, channel):
   # Finds and executs the command, filling in response
   response = None
   # This is where you start to implement more commands!
-  if "help" in command.lower():
+  if  command.lower() == "how are you":
+    response = "I'm great! Hope you're feeling great too!"
+  elif command.lower() == "who are you":
+    response = "Can you read? My name is Emily!"
+  elif "help" in command.lower():
     response = "List of known commands:" + "\n"
     for i in range(0, 3):
       response = response + listCommand[i] + commandDescr[i] + "\n" 
@@ -78,13 +82,13 @@ def handle_command(command, channel):
     weatherConditions = weather.get_weather(location)
     response = "Weather in " + location + ":" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
     response += "\n" + "Looks like " +  weatherConditions[3].lower() + " today. " + weather.advice_response(weatherConditions[3])
-   
+    response += "\n" + "It's " + str(weatherConditions[0]) + " " + degree_sign + "F. " + weather.check_severity(weatherConditions[0])
   # Get weather today
   elif todaysWeatherKeyword and command.find("weather") != 1:
     weatherConditions = weather.get_weather_no_location()
-    print(weatherConditions)
     response = "Today's Weather:" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
     response += "\n" + "It's " + str(weatherConditions[0]) + " " + degree_sign + "F. " + weather.check_severity(weatherConditions[0])
+    response += "\n" + "Looks like " +  weatherConditions[3].lower() + " today. " + weather.advice_response(weatherConditions[3])
   # LocationError handling
   elif not todaysWeatherKeyword and location == "No locations found.":
     response = "Sorry, can't find the weather for that place."
