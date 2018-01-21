@@ -89,7 +89,6 @@ def get_todays_agenda():
         start = dt.strftime("%B %d, %Y %I:%M:%S %p")
         responseString = responseString + start + " " + event['summary'] +  " @ " + event['location'] + "\n"
         # print(start, event['summary'])
-    
     return responseString
 
 
