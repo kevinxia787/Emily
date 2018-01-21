@@ -42,6 +42,7 @@ entrypoints==0.2.3
 et-xmlfile==1.0.1
 fastcache==1.0.2
 filelock==2.0.12
+flake8==3.5.0
 Flask==0.12.2
 Flask-Cors==3.0.3
 future==0.16.0
@@ -51,6 +52,8 @@ glob2==0.5
 gmpy2==2.0.8
 google-api-python-client==1.6.4
 greenlet==0.4.12
+gTTS==1.2.2
+gTTS-token==1.1.1
 h5py==2.7.0
 heapdict==1.0.0
 html5lib==0.999999999
@@ -108,9 +111,11 @@ path.py==10.3.1
 pathlib2==2.3.0
 patsy==0.4.1
 pep8==1.7.0
+pew==1.1.2
 pexpect==4.2.1
 pickleshare==0.7.4
 Pillow==4.2.1
+pipenv==9.0.1
 pkginfo==1.4.1
 ply==3.10
 prompt-toolkit==1.0.15
@@ -177,6 +182,7 @@ unicodecsv==0.14.1
 uritemplate==3.0.0
 urllib3==1.22
 virtualenv==15.1.0
+virtualenv-clone==0.2.6
 wcwidth==0.1.7
 webencodings==0.5.1
 websocket-client==0.46.0

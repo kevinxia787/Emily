@@ -5,7 +5,7 @@ from slackclient import SlackClient
 import weather as weather
 import parseCSV as parseCSV
 import googCalendar as googCalendar
-
+import texttospeech as tts
 
 degree_sign = u'\N{DEGREE SIGN}'
 locationsList = parseCSV.readCSV("uscitiesv1.3.csv")
@@ -65,6 +65,10 @@ def handle_command(command, channel):
   todaysWeatherKeyword = weather.find_key_words(todaysWeather, command)
   # Finds and executs the command, filling in response
   response = None
+  voice = False
+  if (command.find("tell") != -1):
+    voice = True
+
   # This is where you start to implement more commands!
   if  command.lower() == "how are you":
     response = "I'm great! Hope you're feeling great too!"
@@ -74,25 +78,29 @@ def handle_command(command, channel):
     response = "List of known commands:" + "\n"
     for i in range(0, 3):
       response = response + listCommand[i] + commandDescr[i] + "\n" 
+    tts.text_to_speech(response)
   # Get's list of events of today
   elif "agenda" in command.lower():
     response = googCalendar.get_todays_agenda()
+    tts.text_to_speech(response, voice)
   # Get weather of a specific location
   elif "weather" and location != "No locations found.":
     weatherConditions = weather.get_weather(location)
     response = "Weather in " + location + ":" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
     response += "\n" + "Looks like " +  weatherConditions[3].lower() + " today. " + weather.advice_response(weatherConditions[3])
     response += "\n" + "It's " + str(weatherConditions[0]) + " " + degree_sign + "F. " + weather.check_severity(weatherConditions[0])
+    tts.text_to_speech(response, voice)
   # Get weather today
   elif todaysWeatherKeyword and command.find("weather") != 1:
     weatherConditions = weather.get_weather_no_location()
     response = "Today's Weather:" + '\n' + "Weather Conditions: " + str(weatherConditions[3]) + '\n' + "Temperature: " + str(weatherConditions[0]) + " " + degree_sign + "F" + '\n'+ "Feels like: " + str(weatherConditions[1]) + " " + degree_sign + "F" + '\n' + "Humidity: " + str(weatherConditions[2]) + "%"
     response += "\n" + "It's " + str(weatherConditions[0]) + " " + degree_sign + "F. " + weather.check_severity(weatherConditions[0])
     response += "\n" + "Looks like " +  weatherConditions[3].lower() + " today. " + weather.advice_response(weatherConditions[3])
+    tts.text_to_speech(response, voice)
   # LocationError handling
   elif not todaysWeatherKeyword and location == "No locations found.":
     response = "Sorry, can't find the weather for that place."
-  
+    tts.text_to_speech(response)
   # Sends the response back to the channel
   slack_client.api_call(
     "chat.postMessage",

@@ -64,13 +64,15 @@ def get_todays_agenda():
     service = discovery.build('calendar', 'v3', http=http)
 
     # now = (datetime.datetime.utcnow().isoformat() + 'Z')  # 'Z' indicates UTC time
-    now = datetime.datetime.utcnow().isoformat() + 'Z'
+    now = datetime.datetime.utcnow()
+    nowMin = now.replace(hour=6).isoformat() + 'Z'
     # maxTime = (datetime.datetime.utcnow().isoformat() + 'Z')
     utcNow = datetime.datetime.utcnow()
-    timeMax = utcNow.replace(hour=utcNow.hour+6).isoformat() + 'Z'
+    # This needs fixing, find 6am todays date in utc, 23:59pm in utc
+    timeMax = utcNow.replace(hour=23).isoformat() + 'Z'
     print("Getting today's agenda")
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, timeMax=timeMax, maxResults=7, singleEvents=True,
+        calendarId='primary', timeMin=nowMin, timeMax=timeMax, maxResults=7, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 

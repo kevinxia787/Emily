@@ -87,7 +87,7 @@ def check_severity(temp):
 def advice_response(weather):
     if weather.find("rain") != -1 or weather.find("drizzle") != -1 and weather.find("snow") == -1:
       return "Wear a hoodie and/or bring an umbrella."
-    elif weather.find("snow") != -1:
+    elif weather.find("snow") != -1 or weather.find("sleet") != -1:
       return "Wear a thick coat and a good pair of boots."
     elif weather.find("fog") != -1:
       return "Drive safe."
